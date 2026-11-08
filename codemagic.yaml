@@ -2,14 +2,22 @@ workflows:
   android-release-apk:
     name: Build Signed Native APK
     max_build_duration: 30
+    environment:
+      java: 17
     scripts:
       - name: Generate Keystore and Build Signed APK
         script: |
-          PROJECT_DIR=$(dirname "$(find . -name "gradlew" | head -n 1)")
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "ERROR: gradlew not found in repository. Files present:"
+            ls -la
+            exit 1
+          fi
+          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
           echo "Found Android project in: $PROJECT_DIR"
           cd "$PROJECT_DIR"
           if [ ! -f "vishnupriya-key.jks" ]; then
-            keytool -genkeypair -v \
+            "$JAVA_HOME/bin/keytool" -genkeypair -v \
               -keystore vishnupriya-key.jks \
               -keyalg RSA \
               -keysize 2048 \
