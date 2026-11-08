@@ -1,0 +1,26 @@
+workflows:
+  android-release-apk:
+    name: Build Signed Native APK
+    max_build_duration: 30
+    scripts:
+      - name: Generate Keystore and Build Signed APK
+        script: |
+          PROJECT_DIR=$(dirname "$(find . -name "gradlew" | head -n 1)")
+          echo "Found Android project in: $PROJECT_DIR"
+          cd "$PROJECT_DIR"
+          if [ ! -f "vishnupriya-key.jks" ]; then
+            keytool -genkeypair -v \
+              -keystore vishnupriya-key.jks \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -alias vishnupriya \
+              -storepass "VPH@Korutla2026" \
+              -keypass "VPH@Korutla2026" \
+              -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
+          fi
+          chmod +x gradlew
+          ./gradlew assembleRelease
+    artifacts:
+      - "**/app/build/outputs/apk/release/*.apk"
+      - "**/vishnupriya-key.jks"
