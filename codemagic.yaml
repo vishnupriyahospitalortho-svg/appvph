@@ -8,11 +8,6 @@ workflows:
       - name: Generate Keystore and Build Signed APK
         script: |
           GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-          if [ -z "$GRADLEW_PATH" ]; then
-            echo "ERROR: gradlew not found in repository. Files present:"
-            ls -la
-            exit 1
-          fi
           PROJECT_DIR=$(dirname "$GRADLEW_PATH")
           echo "Found Android project in: $PROJECT_DIR"
           cd "$PROJECT_DIR"
@@ -27,8 +22,8 @@ workflows:
               -keypass "VPH@Korutla2026" \
               -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
           fi
-          chmod +x gradlew
-          ./gradlew assembleRelease
+          gradle assembleRelease
     artifacts:
       - "**/app/build/outputs/apk/release/*.apk"
       - "**/vishnupriya-key.jks"
+
