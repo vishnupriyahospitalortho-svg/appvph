@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Healthcare Palette (Deep Teal, Emerald, Ocean) -->
+    <color name="primary">#0B5351</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#D4EDE9</color>
+    <color name="on_primary_container">#00201F</color>
+    <color name="secondary">#00796B</color>
+    <color name="tertiary">#E29578</color>
+    <color name="emergency_red">#D32F2F</color>
+    <color name="emergency_red_container">#FFDAD6</color>
+    <color name="background_light">#F8FAF9</color>
+    <color name="surface_light">#FFFFFF</color>
+</resources>

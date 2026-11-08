@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vishnu Priya Hospital</string>
+    <string name="hospital_tagline">Orthopaedic, Trauma &amp; Dental Care Center</string>
+    <string name="hospital_location">NH 63, Near Old Bus Stand, Korutla, Telangana 505326</string>
+    <string name="emergency_helpline">095155 74014</string>
+    <string name="emergency_helpline_alt">094916 20595</string>
+    <string name="hospital_email">vishnupriyahospitalortho@gmail.com</string>
+    
+    <!-- Navigation Tabs (Direct Walk-in OP only, No online bookings) -->
+    <string name="nav_home">Home</string>
+    <string name="nav_doctors">Doctors</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_timings">OP Timings</string>
+    <string name="nav_emergency">Emergency</string>
+    <string name="nav_about">About</string>
+</resources>

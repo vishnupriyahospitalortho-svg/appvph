@@ -1,0 +1,6 @@
+{
+  "name": "Vishnu Priya Hospital Android App",
+  "description": "Native Jetpack Compose Android application for Vishnu Priya Hospital, Korutla (Telangana) featuring Material 3 components, doctor booking, 24/7 emergency services, and full Kotlin codebase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
