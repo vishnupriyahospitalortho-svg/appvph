@@ -9,30 +9,41 @@ workflows:
       - name: Initialize Automated Production Wrapper
         script: |
           cd ~
-          # Create a perfectly clean, standardized native app container
           npm install -g @capacitor/cli
           mkdir native-app && cd native-app
           
-          # Initialize the container using your live website configuration
+          # Initialize app skeleton
           npm init -y
           npm install @capacitor/core @capacitor/android
-          npx cap init "Vishnu Priya Hospital" "com.vishnupriyahospital.korutla" --web-dir=www --web-url="https://your-hospital-website.com"
-          
-          # Build out the native Android platform project structures
           mkdir www && touch www/index.html
+          
+          # Create a proper web wrapper configuration file mapped to your hospital URL
+          cat <<EOF > capacitor.config.json
+          {
+            "appId": "com.vishnupriyahospital.korutla",
+            "appName": "Vishnu Priya Hospital",
+            "webDir": "www",
+            "server": {
+              "url": "https://ai.studio",
+              "cleartext": true
+            }
+          }
+          EOF
+          
+          # Add native Android platform compilation components
           npx cap add android
           
           # Compile the clean release binary package
           cd android
           ./gradlew assembleRelease
           
-          # Move the clean package to the root workspace directory for signing operations
+          # Move target binary to the workspace root execution directory
           cp app/build/outputs/apk/release/app-release-unsigned.apk $CM_BUILD_DIR/app-release-unsigned.apk
       - name: Generate Certificate and Finalize Signing
         script: |
           cd $CM_BUILD_DIR
           # Securely generate your permanent signing key asset
-          "$JAVA_HOME/bin/keytool" -genkeypair -v \
+          "$JAVA_HOME/bin/keytool" -genkeypair -v 
             -keystore vishnupriya-key.jks \
             -keyalg RSA \
             -keysize 2048 \
@@ -42,7 +53,7 @@ workflows:
             -keypass "VPH@Korutla2026" \
             -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
           
-          # Attach the digital signature certificate tool to output the production app package
+          # Apply signature hashes to map the final package distribution layout
           "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -n 1)/apksigner" sign \
             --ks vishnupriya-key.jks \
             --ks-key-alias vishnupriya \
@@ -53,3 +64,4 @@ workflows:
     artifacts:
       - "VishnuPriyaHospital-signed.apk"
       - "vishnupriya-key.jks"
+
