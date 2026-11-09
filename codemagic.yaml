@@ -7,13 +7,27 @@ workflows:
     scripts:
       - name: Build Unsigned Release APK
         script: |
-          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-          PROJECT_DIR=$(dirname "$GRADLEW_PATH")
+          # Find where the Android project lives in the repository
+          GRADLE_FILE=$(find . -name "build.gradle*" | head -n 1)
+          PROJECT_DIR=$(dirname "$GRADLE_FILE")
+          echo "Found Android project directory: $PROJECT_DIR"
           cd "$PROJECT_DIR"
-          gradle assembleRelease
+          
+          # Initialize fresh gradle wrapper scripts inside that directory
+          gradle wrapper
+          chmod +x gradlew
+          
+          # Run the release build task inside the project directory
+          ./gradlew assembleRelease
       - name: Generate Keystore and Sign APK
         script: |
           APK_PATH=$(find . -name "*release*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "ERROR: Release APK was not built successfully."
+            exit 1
+          fi
+          
+          # Generate the keystore file non-interactively
           "$JAVA_HOME/bin/keytool" -genkeypair -v \
             -keystore vishnupriya-key.jks \
             -keyalg RSA \
@@ -23,6 +37,8 @@ workflows:
             -storepass "VPH@Korutla2026" \
             -keypass "VPH@Korutla2026" \
             -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
+          
+          # Sign the built APK using Android build tools
           "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -n 1)/apksigner" sign \
             --ks vishnupriya-key.jks \
             --ks-key-alias vishnupriya \
@@ -31,7 +47,5 @@ workflows:
             --out VishnuPriyaHospital-signed.apk \
             "$APK_PATH"
     artifacts:
-      - "VishnuPriyaHospital-signed.apk"
-      - "vishnupriya-key.jks"
-
-  
+      - "**/VishnuPriyaHospital-signed.apk"
+      - "**/vishnupriya-key.jks"
