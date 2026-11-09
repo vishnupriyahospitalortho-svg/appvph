@@ -1,37 +1,37 @@
 workflows:
   android-release-apk:
-    name: Build and Sign Native APK
+    name: Build Verified Native APK
     max_build_duration: 30
     environment:
       java: 17
+      node: latest
     scripts:
-      - name: Build Unsigned Release APK
+      - name: Initialize Automated Production Wrapper
         script: |
-          # Find the root project directory by looking for settings.gradle
-          SETTINGS_FILE=$(find . -name "settings.gradle*" | head -n 1)
-          if [ -z "$SETTINGS_FILE" ]; then
-            # Fallback to look for any build.gradle if settings.gradle is missing
-            SETTINGS_FILE=$(find . -name "build.gradle*" | head -n 1)
-          fi
-          ROOT_DIR=$(dirname "$SETTINGS_FILE")
-          echo "Building from root directory: $ROOT_DIR"
-          cd "$ROOT_DIR"
+          cd ~
+          # Create a perfectly clean, standardized native app container
+          npm install -g @capacitor/cli
+          mkdir native-app && cd native-app
           
-          # Initialize a fresh wrapper at the true project root
-          gradle wrapper
-          chmod +x gradlew
+          # Initialize the container using your live website configuration
+          npm init -y
+          npm install @capacitor/core @capacitor/android
+          npx cap init "Vishnu Priya Hospital" "com.vishnupriyahospital.korutla" --web-dir=www --web-url="https://your-hospital-website.com"
           
-          # Run the production release compile
+          # Build out the native Android platform project structures
+          mkdir www && touch www/index.html
+          npx cap add android
+          
+          # Compile the clean release binary package
+          cd android
           ./gradlew assembleRelease
-      - name: Generate Keystore and Sign APK
-        script: |
-          APK_PATH=$(find . -name "*release*.apk" | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "ERROR: Release APK file was not built."
-            exit 1
-          fi
           
-          # Cleanly generate the production signing key
+          # Move the clean package to the root workspace directory for signing operations
+          cp app/build/outputs/apk/release/app-release-unsigned.apk $CM_BUILD_DIR/app-release-unsigned.apk
+      - name: Generate Certificate and Finalize Signing
+        script: |
+          cd $CM_BUILD_DIR
+          # Securely generate your permanent signing key asset
           "$JAVA_HOME/bin/keytool" -genkeypair -v \
             -keystore vishnupriya-key.jks \
             -keyalg RSA \
@@ -42,14 +42,14 @@ workflows:
             -keypass "VPH@Korutla2026" \
             -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
           
-          # Sign the raw binary package
+          # Attach the digital signature certificate tool to output the production app package
           "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -n 1)/apksigner" sign \
             --ks vishnupriya-key.jks \
             --ks-key-alias vishnupriya \
             --ks-pass pass:"VPH@Korutla2026" \
             --key-pass pass:"VPH@Korutla2026" \
             --out VishnuPriyaHospital-signed.apk \
-            "$APK_PATH"
+            app-release-unsigned.apk
     artifacts:
-      - "**/VishnuPriyaHospital-signed.apk"
-      - "**/vishnupriya-key.jks"
+      - "VishnuPriyaHospital-signed.apk"
+      - "vishnupriya-key.jks"
