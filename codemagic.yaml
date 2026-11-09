@@ -1,29 +1,37 @@
 workflows:
   android-release-apk:
-    name: Build Signed Native APK
+    name: Build and Sign Native APK
     max_build_duration: 30
     environment:
       java: 17
     scripts:
-      - name: Generate Keystore and Build Signed APK
+      - name: Build Unsigned Release APK
         script: |
           GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
           PROJECT_DIR=$(dirname "$GRADLEW_PATH")
-          echo "Found Android project in: $PROJECT_DIR"
           cd "$PROJECT_DIR"
-          if [ ! -f "vishnupriya-key.jks" ]; then
-            "$JAVA_HOME/bin/keytool" -genkeypair -v \
-              -keystore vishnupriya-key.jks \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -alias vishnupriya \
-              -storepass "VPH@Korutla2026" \
-              -keypass "VPH@Korutla2026" \
-              -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
-          fi
           gradle assembleRelease
+      - name: Generate Keystore and Sign APK
+        script: |
+          APK_PATH=$(find . -name "*release*.apk" | head -n 1)
+          "$JAVA_HOME/bin/keytool" -genkeypair -v \
+            -keystore vishnupriya-key.jks \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -alias vishnupriya \
+            -storepass "VPH@Korutla2026" \
+            -keypass "VPH@Korutla2026" \
+            -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
+          "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -n 1)/apksigner" sign \
+            --ks vishnupriya-key.jks \
+            --ks-key-alias vishnupriya \
+            --ks-pass pass:"VPH@Korutla2026" \
+            --key-pass pass:"VPH@Korutla2026" \
+            --out VishnuPriyaHospital-signed.apk \
+            "$APK_PATH"
     artifacts:
-      - "**/app/build/outputs/apk/release/*.apk"
-      - "**/vishnupriya-key.jks"
+      - "VishnuPriyaHospital-signed.apk"
+      - "vishnupriya-key.jks"
 
+  
