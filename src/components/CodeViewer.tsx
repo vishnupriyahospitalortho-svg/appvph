@@ -114,17 +114,16 @@ zipStorePath=wrapper/dists
 - **Minimum SDK**: 24 (Android 7.0+)
 - **Target SDK**: 34 (Android 14)
 - **Permissions**: ONLY \`android.permission.INTERNET\` (Zero camera, mic, location, or storage permissions)
-- **Release Signing**: Keystore \`vishnupriya-key.jks\`, alias \`vishnupriya\`, pass \`VPH@Korutla2026\`
-- **Minification**: R8 / ProGuard enabled with resource shrinking
+- **Minification**: R8 / ProGuard enabled with resource shrinking (\`isShrinkResources = true\`)
+- **Gradle Version**: Configured with Gradle 8.9 LTS wrapper for seamless CI/CD execution
 
-## Zero-Input 1-Click Production Build
-To automatically generate the release keystore and compile the signed production APK:
+## Building in CI/CD & Command Line
+Run standard Gradle commands on any CI/CD pipeline (GitHub Actions, GitLab CI, Bitrise):
 \`\`\`bash
-chmod +x build_signed_apk.sh
-./build_signed_apk.sh
+chmod +x gradlew
+./gradlew assembleRelease
 \`\`\`
-The signed production APK will be created at:
-\`app/build/outputs/apk/release/app-release.apk\`
+*(Signing can be injected via standard environment variables or CI secrets without hardcoding credentials into source control).*
 
 ## Open in Android Studio
 1. Open Android Studio (Hedgehog, Iguana, Koala, Ladybug or newer).
@@ -204,7 +203,7 @@ The signed production APK will be created at:
             </div>
 
             <div className="flex gap-1 overflow-x-auto no-scrollbar text-[10px]">
-              {['all', 'build', 'manifest', 'app', 'ui', 'theme', 'config'].map((cat) => (
+              {['all', 'manifest', 'app', 'ui', 'theme', 'config'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategoryFilter(cat)}

@@ -92,20 +92,20 @@ export const SimulatedAboutScreen: React.FC<Props> = ({ isTelugu }) => {
         <div className="mt-2 text-[10px] text-emerald-800 bg-white/70 p-2 rounded-lg font-mono space-y-0.5">
           <div>package: {HOSPITAL_INFO.packageName}</div>
           <div>version: 1.0 (versionCode 1)</div>
-          <div>signing: release (vishnupriya-key.jks)</div>
-          <div>minification: R8 / ProGuard enabled</div>
+          <div>minification: R8 / ProGuard (isShrinkResources = true)</div>
+          <div>build system: Gradle 8.9 LTS wrapper (CI/CD ready)</div>
           <div>framework: Kotlin 2.0 + Compose BOM + Material 3</div>
         </div>
       </div>
 
-      {/* Production APK Ready Card */}
+      {/* CI/CD & Build Architecture Card */}
       <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 border border-slate-800">
         <div className="flex items-center space-x-2 text-teal-400 font-bold text-xs mb-1">
           <FileCode2 className="w-4 h-4" />
-          <span>Production APK 1-Click Builder Ready</span>
+          <span>CI/CD & Cloud Build Ready</span>
         </div>
         <p className="text-[11px] text-slate-300 leading-relaxed">
-          Run <code className="text-teal-300 bg-slate-800 px-1 py-0.5 rounded font-mono">./build_signed_apk.sh</code> to automatically generate the production keystore and compile <code className="text-emerald-400 font-mono">app-release.apk</code> without manual inputs.
+          The project is cleanly configured for automated CI/CD runners (GitHub Actions, GitLab CI) with Gradle 8.9. Zero hardcoded keystores or passwords in source code. Run <code className="text-teal-300 bg-slate-800 px-1 py-0.5 rounded font-mono">./gradlew assembleRelease</code> cleanly anywhere.
         </p>
       </div>
     </div>

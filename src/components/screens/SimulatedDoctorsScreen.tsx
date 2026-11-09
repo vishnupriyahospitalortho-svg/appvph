@@ -113,7 +113,7 @@ export const SimulatedDoctorsScreen: React.FC<Props> = ({ isTelugu, onNavigateTo
               <div className="mt-3 flex gap-2">
                 <button
                   onClick={() => onTriggerCall(HOSPITAL_INFO.emergencyPhone)}
-                  className="flex-1 bg-teal-800 hover:bg-teal-900 active:scale-[0.98] text-white py-2 px-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-transform"
+                  className="flex-1 bg-teal-800 hover:bg-teal-900 text-white py-2 px-3 rounded-lg font-semibold text-xs flex items-center justify-center gap-1.5"
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
                   <span>{isTelugu ? 'రిసెప్షన్‌కు కాల్ చేయండి' : 'Call Reception'}</span>

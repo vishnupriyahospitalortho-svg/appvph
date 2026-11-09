@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+/* ==========================================================================
+   Flat 1:1 Rectangular Projection Surface (Zero Keystone / Perspective Warp)
+   ========================================================================== */
+*, *::before, *::after {
+  transform-style: flat !important;
+  perspective: none !important;
+  backface-visibility: visible !important;
+}
+
+html, body, #root {
+  transform: none !important;
+  perspective: none !important;
+  transform-style: flat !important;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}

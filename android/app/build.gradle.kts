@@ -21,20 +21,10 @@ android {
         }
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("../vishnupriya-key.jks")
-            storePassword = "VPH@Korutla2026"
-            keyAlias = "vishnupriya"
-            keyPassword = "VPH@Korutla2026"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

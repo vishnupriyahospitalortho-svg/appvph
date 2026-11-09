@@ -45,7 +45,7 @@ export default function App() {
                   100% Native Android
                 </span>
                 <span className="hidden md:inline-block bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  Release Signing Ready
+                  CI/CD Ready (Gradle 8.9)
                 </span>
               </div>
               <p className="text-xs text-slate-400">

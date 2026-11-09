@@ -3,86 +3,16 @@ export interface AndroidFile {
   name: string;
   language: "kotlin" | "xml" | "groovy" | "toml" | "properties" | "bash";
   description: string;
-  category: "app" | "ui" | "theme" | "navigation" | "model" | "config" | "manifest" | "build";
+  category: "app" | "ui" | "theme" | "navigation" | "model" | "config" | "manifest";
   content: string;
 }
 
 export const ANDROID_FILES: AndroidFile[] = [
   {
-    path: "build_signed_apk.sh",
-    name: "build_signed_apk.sh",
-    language: "bash",
-    description: "Zero-input one-click script: automatically generates vishnupriya-key.jks if missing and compiles the signed production APK.",
-    category: "build",
-    content: `#!/usr/bin/env bash
-# ==============================================================================
-# Vishnu Priya Hospital, Korutla - Zero-Input Production APK Build & Sign Script
-# Package: com.vishnupriyahospital.korutla
-# ==============================================================================
-
-set -e
-
-echo "======================================================================"
-echo "  Vishnu Priya Hospital - Zero-Input Release APK Builder              "
-echo "  Package: com.vishnupriyahospital.korutla                           "
-echo "======================================================================"
-
-SCRIPT_DIR="$(cd "$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-
-if [ ! -f "settings.gradle.kts" ] && [ -d "android" ]; then
-    cd android
-fi
-
-KEYSTORE_FILE="vishnupriya-key.jks"
-KEY_ALIAS="vishnupriya"
-STORE_PASS="VPH@Korutla2026"
-KEY_PASS="VPH@Korutla2026"
-
-echo ""
-echo "[Step 1/3] Checking release keystore: $KEYSTORE_FILE"
-if [ ! -f "$KEYSTORE_FILE" ]; then
-    echo "Keystore not found. Generating production keystore non-interactively..."
-    keytool -genkeypair -v \\
-        -keystore "$KEYSTORE_FILE" \\
-        -keyalg RSA \\
-        -keysize 2048 \\
-        -validity 10000 \\
-        -alias "$KEY_ALIAS" \\
-        -storepass "$STORE_PASS" \\
-        -keypass "$KEY_PASS" \\
-        -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
-    echo "Keystore successfully generated: $KEYSTORE_FILE"
-else
-    echo "Release keystore is present and verified: $KEYSTORE_FILE"
-fi
-
-echo ""
-echo "[Step 2/3] Setting Gradle permissions..."
-chmod +x gradlew || true
-
-echo ""
-echo "[Step 3/3] Compiling and Signing Production Release APK..."
-./gradlew assembleRelease
-
-echo ""
-APK_PATH="app/build/outputs/apk/release/app-release.apk"
-if [ -f "$APK_PATH" ]; then
-    echo "======================================================================"
-    echo " BUILD SUCCESSFUL! "
-    echo " Production Signed APK ready at:"
-    echo " -> $APK_PATH"
-    echo "======================================================================"
-    ls -lh "$APK_PATH"
-else
-    echo "Release build completed. Output files located in: app/build/outputs/apk/release/"
-fi`
-  },
-  {
     path: "app/build.gradle.kts",
     name: "app/build.gradle.kts",
     language: "groovy",
-    description: "App Gradle configuration: Release signing config with vishnupriya-key.jks, isMinifyEnabled = true, isShrinkResources = true, versionCode 1, versionName '1.0'.",
+    description: "App Gradle build script configured for CI/CD: isMinifyEnabled = true, isShrinkResources = true, versionCode 1, versionName '1.0'. No hardcoded keys.",
     category: "config",
     content: `plugins {
     alias(libs.plugins.android.application)
@@ -107,20 +37,10 @@ android {
         }
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("../vishnupriya-key.jks")
-            storePassword = "VPH@Korutla2026"
-            keyAlias = "vishnupriya"
-            keyPassword = "VPH@Korutla2026"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -162,6 +82,20 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
 }`
+  },
+  {
+    path: "gradle/wrapper/gradle-wrapper.properties",
+    name: "gradle-wrapper.properties",
+    language: "properties",
+    description: "Official Gradle 8.9 LTS distribution wrapper for clean execution across any CI/CD runner and Android Studio.",
+    category: "config",
+    content: `distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\\://services.gradle.org/distributions/gradle-8.9-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists`
   },
   {
     path: "app/proguard-rules.pro",
