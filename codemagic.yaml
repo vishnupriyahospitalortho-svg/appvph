@@ -7,27 +7,31 @@ workflows:
     scripts:
       - name: Build Unsigned Release APK
         script: |
-          # Find where the Android project lives in the repository
-          GRADLE_FILE=$(find . -name "build.gradle*" | head -n 1)
-          PROJECT_DIR=$(dirname "$GRADLE_FILE")
-          echo "Found Android project directory: $PROJECT_DIR"
-          cd "$PROJECT_DIR"
+          # Find the root project directory by looking for settings.gradle
+          SETTINGS_FILE=$(find . -name "settings.gradle*" | head -n 1)
+          if [ -z "$SETTINGS_FILE" ]; then
+            # Fallback to look for any build.gradle if settings.gradle is missing
+            SETTINGS_FILE=$(find . -name "build.gradle*" | head -n 1)
+          fi
+          ROOT_DIR=$(dirname "$SETTINGS_FILE")
+          echo "Building from root directory: $ROOT_DIR"
+          cd "$ROOT_DIR"
           
-          # Initialize fresh gradle wrapper scripts inside that directory
+          # Initialize a fresh wrapper at the true project root
           gradle wrapper
           chmod +x gradlew
           
-          # Run the release build task inside the project directory
+          # Run the production release compile
           ./gradlew assembleRelease
       - name: Generate Keystore and Sign APK
         script: |
           APK_PATH=$(find . -name "*release*.apk" | head -n 1)
           if [ -z "$APK_PATH" ]; then
-            echo "ERROR: Release APK was not built successfully."
+            echo "ERROR: Release APK file was not built."
             exit 1
           fi
           
-          # Generate the keystore file non-interactively
+          # Cleanly generate the production signing key
           "$JAVA_HOME/bin/keytool" -genkeypair -v \
             -keystore vishnupriya-key.jks \
             -keyalg RSA \
@@ -38,7 +42,7 @@ workflows:
             -keypass "VPH@Korutla2026" \
             -dname "CN=Vishnu Priya Hospital, OU=Administration, O=Vishnu Priya Hospital, L=Korutla, ST=Telangana, C=IN"
           
-          # Sign the built APK using Android build tools
+          # Sign the raw binary package
           "$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -n 1)/apksigner" sign \
             --ks vishnupriya-key.jks \
             --ks-key-alias vishnupriya \
